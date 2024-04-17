@@ -1,15 +1,17 @@
 function main() {
-    // Define variables for the renderer, scene, camera, and cube
+    // Define variables for the renderer, scene, camera, and cubes
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 3/2, 0.1, 1000);
-    const cube = createCube();
     const gridHelper = createGridHelper(); // Create grid helper
     const axesHelper = new THREE.AxesHelper(1); // 1 is the length of the axes
     const skybox = createSkybox(); // Create skybox
 
+    const colorCellCoordinates = createColorCellCoordinates(5);
+    const cubes = createCubes(colorCellCoordinates); // Create cubes based on coordinates
+
     // Set initial camera position and orientation
-    const initialCameraPosition = { r: 5, theta: Math.PI / 4, fixedZ: 3 }; // Initial polar coordinates (r, θ) and fixed Z-coordinate
+    const initialCameraPosition = { r: 10, theta: Math.PI / 4, fixedZ: 5 }; // Initial polar coordinates (r, θ) and fixed Z-coordinate
     updateCameraPosition(); // Update camera position based on initial polar coordinates
     updateCameraUp(); // Update camera up vector
     updateCameraLookAt(); // Make the camera look at the origin
@@ -21,7 +23,7 @@ function main() {
     document.querySelector('main').appendChild(renderer.domElement);
 
     // Add objects to the scene
-    scene.add(cube);
+    cubes.forEach(cube => scene.add(cube));
     scene.add(gridHelper);
     scene.add(axesHelper);
     scene.add(skybox); // Add skybox to the scene
@@ -30,9 +32,10 @@ function main() {
     function animate(time) {
         time *= 0.001;
 
-        const rotation = time;
-        cube.rotation.x = rotation;
-        cube.rotation.y = rotation;
+        cubes.forEach(cube => {
+            cube.rotation.x = time;
+            cube.rotation.y = time;
+        });
 
         renderer.render(scene, camera);
 
@@ -41,16 +44,9 @@ function main() {
 
     animate();
 
-    // Function to create the cube
-    function createCube() {
-        const geometry = new THREE.BoxGeometry(0.25, 0.25, 0.25);
-        const material = new THREE.MeshBasicMaterial({ color: 0xf08020 });
-        return new THREE.Mesh(geometry, material);
-    }
-
     // Function to create the grid helper
     function createGridHelper() {
-        const gridHelper = new THREE.GridHelper(10, 10); // 10x10 grid
+        const gridHelper = new THREE.GridHelper(12, 12); // 10x10 grid
         gridHelper.rotation.x = Math.PI / 2; // Rotate to align with XY plane
         return gridHelper;
     }
@@ -62,6 +58,34 @@ function main() {
         const skyboxMaterial = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide });
         const skyboxGeometry = new THREE.BoxGeometry(1000, 1000, 1000); // Adjust size as needed
         return new THREE.Mesh(skyboxGeometry, skyboxMaterial);
+    }
+
+    function createColorCellCoordinates(n) {
+        let colorCellCoordinates = [];
+        for (let x = 0; x < n; x++) {
+            for (let y = 0; y < n; y++) {
+                for (let z = 0; z < n; z++) {
+                    colorCellCoordinates.push(new THREE.Vector3(x, y, z));
+                }
+            }
+        }
+        return colorCellCoordinates;
+    }
+
+    // Function to create cubes based on coordinates
+    function createCubes(coordinates) {
+        const cubes = [];
+        const cubeSize = 0.25; // Adjust size as needed
+
+        coordinates.forEach(coord => {
+            const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+            const material = new THREE.MeshBasicMaterial({ color: 0xf08020 });
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.copy(coord); // Set cube position based on coordinate
+            cubes.push(cube);
+        });
+
+        return cubes;
     }
 
     // Function to update camera position based on polar coordinates (r, θ) and fixed Z-coordinate
