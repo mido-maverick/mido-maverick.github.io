@@ -1,7 +1,46 @@
+html,
 body
 {
-    margin: 5% 5%;
+    margin: 0;
+    border: 0;
+    padding: 0;
     background-color: whitesmoke;
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    font-size: x-large;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: larger;
+}
+
+header
+{
+    padding: 18px 60px;
+    font-size: xx-large;
+    font-weight: bolder;
+    box-shadow: 0 2px 4px lightgray;
+}
+
+main
+{
+    padding: 60px 144px;
+}
+
+footer
+{
+    padding: 144px;
+}
+
+a
+{
+    color: royalblue;
+    text-decoration: none;
+}
+
+a:hover,
+a:focus
+{
+    text-decoration: underline;
+    outline: none;
+}
+
+a:active
+{
+    color: cornflowerblue;
 }
