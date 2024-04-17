@@ -1,7 +1,7 @@
 function main() {
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(30, 3/2, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(30, 3 / 2, 0.1, 1000);
     const gridHelper = createGridHelper();
     const axesHelper = new THREE.AxesHelper(1);
     const skybox = createSkybox();
@@ -10,6 +10,11 @@ function main() {
     const colorCells = createColorCells(colorCellPositions);
 
     const initialCameraPosition = { r: 18, theta: -Math.PI / 4, fixedZ: 3 };
+    let dragging = false;
+    let prevMousePosition = {
+        x: 0,
+        y: 0
+    };
 
     updateCameraPosition();
     updateCameraUp();
@@ -20,6 +25,10 @@ function main() {
 
     colorCells.forEach(cube => scene.add(cube));
     scene.add(gridHelper, axesHelper, skybox);
+
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
 
     animate();
 
@@ -53,12 +62,12 @@ function main() {
     function createColorCellPositions(n) {
         const colorCellCoordinates = [];
         const rotationMatrix = new THREE.Matrix4().set(
-            Math.sqrt(6)/3, -Math.sqrt(6)/6, -Math.sqrt(6)/6, 0,
-                         0,  Math.sqrt(2)/2, -Math.sqrt(2)/2, 0,
-            Math.sqrt(3)/3,  Math.sqrt(3)/3,  Math.sqrt(3)/3, 0,
-                         0,               0,               0, 1
+            Math.sqrt(6) / 3, -Math.sqrt(6) / 6, -Math.sqrt(6) / 6, 0,
+            0, Math.sqrt(2) / 2, -Math.sqrt(2) / 2, 0,
+            Math.sqrt(3) / 3, Math.sqrt(3) / 3, Math.sqrt(3) / 3, 0,
+            0, 0, 0, 1
         );
-        const translationMatrix = new THREE.Matrix4().makeTranslation(0, 0, -n/2*Math.sqrt(2));
+        const translationMatrix = new THREE.Matrix4().makeTranslation(0, 0, -n / 2 * Math.sqrt(2));
         for (let x = 0; x < n; x++) {
             for (let y = 0; y < n; y++) {
                 for (let z = 0; z < n; z++) {
@@ -87,6 +96,7 @@ function main() {
         camera.position.x = initialCameraPosition.r * Math.cos(initialCameraPosition.theta);
         camera.position.y = initialCameraPosition.r * Math.sin(initialCameraPosition.theta);
         camera.position.z = initialCameraPosition.fixedZ;
+        updateCameraLookAt(0, 0, 0);
     }
 
     function updateCameraUp() {
@@ -95,6 +105,26 @@ function main() {
 
     function updateCameraLookAt() {
         camera.lookAt(0, 0, 0);
+    }
+
+    function onMouseDown(event) {
+        dragging = true;
+        prevMousePosition.x = event.clientX;
+        prevMousePosition.y = event.clientY;
+    }
+
+    function onMouseMove(event) {
+        if (dragging) {
+            const deltaTheta = (event.clientX - prevMousePosition.x) * 0.01;
+            initialCameraPosition.theta += deltaTheta;
+            updateCameraPosition();
+            prevMousePosition.x = event.clientX;
+            prevMousePosition.y = event.clientY;
+        }
+    }
+
+    function onMouseUp(event) {
+        dragging = false;
     }
 }
 
