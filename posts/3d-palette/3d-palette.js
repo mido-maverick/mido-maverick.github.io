@@ -115,7 +115,7 @@ function main() {
 
     function onMouseMove(event) {
         if (dragging) {
-            const deltaTheta = (event.clientX - prevMousePosition.x) * 0.01;
+            const deltaTheta = (event.clientX - prevMousePosition.x) * -0.005;
             initialCameraPosition.theta += deltaTheta;
             updateCameraPosition();
             prevMousePosition.x = event.clientX;
