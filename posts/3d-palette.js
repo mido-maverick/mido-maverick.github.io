@@ -2,7 +2,7 @@ function main() {
     // Define variables for the renderer, scene, camera, and cube
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, 16/9, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, 3/2, 0.1, 1000);
     const cube = createCube();
     const gridHelper = createGridHelper(); // Create grid helper
     const axesHelper = new THREE.AxesHelper(5); // 5 is the length of the axes
@@ -15,10 +15,11 @@ function main() {
     updateCameraLookAt(); // Make the camera look at the origin
 
     // Set up renderer
-    renderer.setSize(1280, 720);
+    renderer.setSize(768, 512);
 
     // Append renderer's DOM element to the document body
-    document.body.appendChild(renderer.domElement);
+    //document.body.appendChild(renderer.domElement);
+    document.querySelector('main').appendChild(renderer.domElement);
 
     // Add objects to the scene
     scene.add(cube);
