@@ -17,10 +17,7 @@ function main() {
 
     const initialCameraPosition = { r: 4 * paletteSize, theta: -Math.PI / 4, fixedZ: 3 };
     let dragging = false;
-    let prevMousePosition = {
-        x: 0,
-        y: 0
-    };
+    let prevMousePosition = { x: 0, y: 0 };
 
     updateCameraPosition();
     updateCameraUp();
@@ -43,9 +40,7 @@ function main() {
     function animate(time) {
         time *= 0.001;
 
-        colorCells.forEach(cell => {
-            cell.lookAt(camera.position);
-        });
+        colorCells.forEach(cell => { cell.lookAt(camera.position); });
 
         renderer.render(scene, camera);
 
@@ -102,7 +97,6 @@ function main() {
             const rgb = culori.convertOklabToRgb(Oklab);
             const color = new THREE.Color().setRGB(rgb.r, rgb.g, rgb.b);
 
-            // Create hexagon geometry
             const geometry = new THREE.CircleGeometry(cellSize / 2, 6);
             const material = new THREE.MeshBasicMaterial({ color: color });
             const colorCell = new THREE.Mesh(geometry, material);
