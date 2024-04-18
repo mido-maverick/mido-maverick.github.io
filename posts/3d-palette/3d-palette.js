@@ -85,12 +85,19 @@ function main() {
         const colorCells = [];
         const cellSize = 0.25;
         coordinates.forEach(coord => {
-            const r = Math.sqrt(coord.x**2 + coord.y**2);
-            const theta = Math.atan2(coord.y, coord.x);
-            const z = coord.z;
-            //const okHslColor = color();
+            // Calculate hue based on coordinates
+            const hue = (Math.atan2(coord.y, coord.x) / Math.PI * 180 % 360) / 360;
+            // Calculate saturation based on radial distance
+            const saturation = Math.min(1, Math.sqrt(coord.x * coord.x + coord.y * coord.y) / 3); // Assuming 6 is the maximum radius
+            // Calculate lightness based on z-coordinate
+            const lightness = ((coord.z+6) / (coordinates.length - 1)) * 0.5 + 0.5; // Normalize z-coordinate to range [0, 1]
+    
+            // Convert HSL to RGB
+            const color = new THREE.Color().setHSL(hue, saturation, lightness);
+    
+            // Create hexagon geometry
             const geometry = new THREE.OctahedronGeometry(cellSize, 0);
-            const material = new THREE.MeshBasicMaterial({ color: 0xf08020 });
+            const material = new THREE.MeshBasicMaterial({ color: color });
             const colorCell = new THREE.Mesh(geometry, material);
             colorCell.position.copy(coord);
             colorCells.push(colorCell);
