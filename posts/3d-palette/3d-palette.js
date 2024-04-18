@@ -2,8 +2,8 @@ function main() {
     const width = 768;
     const height = 512;
     const paletteSize = 10;
-    const paletteDivision = 6;
-    const cellSize = 0.5;
+    const paletteDivision = 12;
+    const cellSize = paletteSize/paletteDivision*0.8;
 
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
@@ -98,7 +98,7 @@ function main() {
             const color = new THREE.Color().setHSL(hue, saturation, lightness);
     
             // Create hexagon geometry
-            const geometry = new THREE.CircleGeometry(cellSize, 6);
+            const geometry = new THREE.CircleGeometry(cellSize/2, 6);
             const material = new THREE.MeshBasicMaterial({ color: color });
             const colorCell = new THREE.Mesh(geometry, material);
             colorCell.position.copy(coord);
