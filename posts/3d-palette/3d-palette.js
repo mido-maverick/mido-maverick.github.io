@@ -2,7 +2,7 @@ function main() {
     const width = 768;
     const height = 512;
     const paletteSize = 10;
-    const paletteDivision = 12;
+    const paletteDivision = 5;
     const cellSize = paletteSize/paletteDivision*0.8;
 
     const renderer = new THREE.WebGLRenderer();
