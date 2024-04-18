@@ -80,16 +80,17 @@ function main() {
     }
 
     function createColorCells(coordinates) {
-        const cubes = [];
+        const colorCells = [];
         const cubeSize = 0.25;
         coordinates.forEach(coord => {
-            const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+            //const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+            const geometry = new THREE.OctahedronGeometry(0.25, 0);
             const material = new THREE.MeshBasicMaterial({ color: 0xf08020 });
-            const cube = new THREE.Mesh(geometry, material);
-            cube.position.copy(coord);
-            cubes.push(cube);
+            const colorCell = new THREE.Mesh(geometry, material);
+            colorCell.position.copy(coord);
+            colorCells.push(colorCell);
         });
-        return cubes;
+        return colorCells;
     }
 
     function updateCameraPosition() {
