@@ -2,12 +2,12 @@ function main() {
     const width = 768;
     const height = 512;
     const paletteSize = 10;
-    const paletteDivision = 5;
-    const cellSize = paletteSize/paletteDivision*0.8;
+    const paletteDivision = 12;
+    const cellSize = 0.5 * paletteSize / paletteDivision;
 
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(30, width/height, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 1000);
     const gridHelper = createGridHelper();
     const axesHelper = new THREE.AxesHelper(1);
     const skybox = createSkybox();
@@ -15,7 +15,7 @@ function main() {
     const colorCellPositions = createColorCellPositions(paletteDivision);
     const colorCells = createColorCells(colorCellPositions);
 
-    const initialCameraPosition = { r: 4*paletteSize, theta: -Math.PI / 4, fixedZ: 3 };
+    const initialCameraPosition = { r: 4 * paletteSize, theta: -Math.PI / 4, fixedZ: 3 };
     let dragging = false;
     let prevMousePosition = {
         x: 0,
@@ -30,7 +30,9 @@ function main() {
     document.querySelector('main').appendChild(renderer.domElement);
 
     colorCells.forEach(cell => scene.add(cell));
-    scene.add(/*gridHelper, axesHelper, */skybox);
+    scene.add(skybox);
+    //scene.add(axesHelper);
+    //scene.add(gridHelper);
 
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('mousemove', onMouseMove);
@@ -51,7 +53,7 @@ function main() {
     }
 
     function createGridHelper() {
-        const gridHelper = new THREE.GridHelper(paletteSize * 5, paletteSize * 5);
+        const gridHelper = new THREE.GridHelper(5 * paletteSize, 5 * paletteSize);
         gridHelper.rotation.x = Math.PI / 2;
         return gridHelper;
     }
@@ -67,15 +69,15 @@ function main() {
     function createColorCellPositions(paletteDivision) {
         const colorCellPositions = [];
         const rotationMatrix = new THREE.Matrix4().set(
-            Math.sqrt(6)/3, -Math.sqrt(6)/6, -Math.sqrt(6)/6, 0,
-                         0,  Math.sqrt(2)/2, -Math.sqrt(2)/2, 0,
-            Math.sqrt(3)/3,  Math.sqrt(3)/3,  Math.sqrt(3)/3, 0,
-                         0,               0,               0, 1
+            Math.sqrt(6) / 3, -Math.sqrt(6) / 6, -Math.sqrt(6) / 6, 0,
+                           0,  Math.sqrt(2) / 2, -Math.sqrt(2) / 2, 0,
+            Math.sqrt(3) / 3,  Math.sqrt(3) / 3,  Math.sqrt(3) / 3, 0,
+                           0,                 0,                 0, 1
         );
-        const translationMatrix = new THREE.Matrix4().makeTranslation(0, 0, -paletteSize*Math.sqrt(3)/2);
-        for (let x = 0; x <= paletteSize; x += paletteSize / (paletteDivision )) {
-            for (let y = 0; y <= paletteSize; y += paletteSize / (paletteDivision )) {
-                for (let z = 0; z <= paletteSize; z += paletteSize / (paletteDivision )) {
+        const translationMatrix = new THREE.Matrix4().makeTranslation(0, 0, -paletteSize * Math.sqrt(3) / 2);
+        for (let x = 0; x <= paletteSize; x += paletteSize / (paletteDivision)) {
+            for (let y = 0; y <= paletteSize; y += paletteSize / (paletteDivision)) {
+                for (let z = 0; z <= paletteSize; z += paletteSize / (paletteDivision)) {
                     const vector = new THREE.Vector3(x, y, z).applyMatrix4(rotationMatrix).applyMatrix4(translationMatrix);
                     colorCellPositions.push(vector);
                 }
@@ -87,18 +89,21 @@ function main() {
     function createColorCells(positions) {
         const colorCells = [];
         positions.forEach(coord => {
-            // Calculate hue based on coordinates
-            const hue = (Math.atan2(coord.y, coord.x) / Math.PI * 180 % 360) / 360;
-            // Calculate saturation based on radial distance
-            const saturation = Math.min(1, Math.sqrt(coord.x * coord.x + coord.y * coord.y) / 3); // Assuming 6 is the maximum radius
-            // Calculate lightness based on z-coordinate
-            const lightness = ((coord.z+6) / (positions.length - 1)) * 0.5 + 0.5; // Normalize z-coordinate to range [0, 1]
-    
-            // Convert HSL to RGB
-            const color = new THREE.Color().setHSL(hue, saturation, lightness);
-    
+            const hue = (Math.atan2(coord.y, coord.x) / Math.PI * 180 % 360);
+            const saturation = Math.min(1, Math.sqrt(coord.x * coord.x + coord.y * coord.y) / (paletteSize / 2));
+            const lightness = ((coord.z + paletteSize) / (paletteSize * Math.sqrt(3)));
+
+            const Okhsl = culori.okhsl('white');
+            Okhsl.h = hue;
+            Okhsl.s = saturation;
+            Okhsl.l = lightness;
+            console.log(Okhsl.l);
+            const Oklab = culori.convertOkhslToOklab(Okhsl);
+            const rgb = culori.convertOklabToRgb(Oklab);
+            const color = new THREE.Color().setRGB(rgb.r, rgb.g, rgb.b);
+
             // Create hexagon geometry
-            const geometry = new THREE.CircleGeometry(cellSize/2, 6);
+            const geometry = new THREE.CircleGeometry(cellSize / 2, 6);
             const material = new THREE.MeshBasicMaterial({ color: color });
             const colorCell = new THREE.Mesh(geometry, material);
             colorCell.position.copy(coord);
