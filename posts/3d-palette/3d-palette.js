@@ -2,8 +2,8 @@ function main() {
     const width = 768;
     const height = 512;
     const paletteSize = 10;
-    const paletteDivision = 12;
-    const cellSize = 0.5 * paletteSize / paletteDivision;
+    const paletteDivision = 8;
+    const cellSize = 0.8 * paletteSize / paletteDivision;
 
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
@@ -16,6 +16,9 @@ function main() {
     const colorCells = createColorCells(colorCellPositions);
 
     const initialCameraPosition = { r: 4 * paletteSize, theta: -Math.PI / 4, fixedZ: 3 };
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
     let dragging = false;
     let prevMousePosition = { x: 0, y: 0 };
 
@@ -92,7 +95,6 @@ function main() {
             Okhsl.h = hue;
             Okhsl.s = saturation;
             Okhsl.l = lightness;
-            console.log(Okhsl.l);
             const Oklab = culori.convertOkhslToOklab(Okhsl);
             const rgb = culori.convertOklabToRgb(Oklab);
             const color = new THREE.Color().setRGB(rgb.r, rgb.g, rgb.b);
@@ -134,6 +136,14 @@ function main() {
             updateCameraPosition();
             prevMousePosition.x = event.clientX;
             prevMousePosition.y = event.clientY;
+        }
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(colorCells, true);
+        if (intersects.length > 0) {
+            const intersectedObject = intersects[0].object;
+            console.log('Mouse is pointing at:', intersectedObject);
         }
     }
 
