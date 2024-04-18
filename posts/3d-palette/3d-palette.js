@@ -1,7 +1,9 @@
 function main() {
+    const width = 768;
+    const height = 512;
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(30, 3 / 2, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(30, width/height, 0.1, 1000);
     const gridHelper = createGridHelper();
     const axesHelper = new THREE.AxesHelper(1);
     const skybox = createSkybox();
@@ -20,7 +22,7 @@ function main() {
     updateCameraUp();
     updateCameraLookAt();
 
-    renderer.setSize(768, 512);
+    renderer.setSize(width, height);
     document.querySelector('main').appendChild(renderer.domElement);
 
     colorCells.forEach(cube => scene.add(cube));
@@ -62,10 +64,10 @@ function main() {
     function createColorCellPositions(n) {
         const colorCellCoordinates = [];
         const rotationMatrix = new THREE.Matrix4().set(
-            Math.sqrt(6) / 3, -Math.sqrt(6) / 6, -Math.sqrt(6) / 6, 0,
-            0, Math.sqrt(2) / 2, -Math.sqrt(2) / 2, 0,
-            Math.sqrt(3) / 3, Math.sqrt(3) / 3, Math.sqrt(3) / 3, 0,
-            0, 0, 0, 1
+            Math.sqrt(6)/3, -Math.sqrt(6)/6, -Math.sqrt(6)/6, 0,
+                         0,  Math.sqrt(2)/2, -Math.sqrt(2)/2, 0,
+            Math.sqrt(3)/3,  Math.sqrt(3)/3,  Math.sqrt(3)/3, 0,
+                         0,               0,               0, 1
         );
         const translationMatrix = new THREE.Matrix4().makeTranslation(0, 0, -n / 2 * Math.sqrt(2));
         for (let x = 0; x < n; x++) {
@@ -81,10 +83,13 @@ function main() {
 
     function createColorCells(coordinates) {
         const colorCells = [];
-        const cubeSize = 0.25;
+        const cellSize = 0.25;
         coordinates.forEach(coord => {
-            //const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
-            const geometry = new THREE.OctahedronGeometry(0.25, 0);
+            const r = Math.sqrt(coord.x**2 + coord.y**2);
+            const theta = Math.atan2(coord.y, coord.x);
+            const z = coord.z;
+            //const okHslColor = color();
+            const geometry = new THREE.OctahedronGeometry(cellSize, 0);
             const material = new THREE.MeshBasicMaterial({ color: 0xf08020 });
             const colorCell = new THREE.Mesh(geometry, material);
             colorCell.position.copy(coord);
