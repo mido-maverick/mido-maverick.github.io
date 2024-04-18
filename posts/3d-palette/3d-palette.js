@@ -1,6 +1,10 @@
 function main() {
     const width = 768;
     const height = 512;
+    const paletteSize = 10;
+    const paletteDivision = 6;
+    const cellSize = 0.5;
+
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(30, width/height, 0.1, 1000);
@@ -8,12 +12,10 @@ function main() {
     const axesHelper = new THREE.AxesHelper(1);
     const skybox = createSkybox();
 
-    const paletteDivision = 8;
-    const paletteSize = 10;
     const colorCellPositions = createColorCellPositions(paletteDivision);
     const colorCells = createColorCells(colorCellPositions);
 
-    const initialCameraPosition = { r: 24, theta: -Math.PI / 4, fixedZ: 3 };
+    const initialCameraPosition = { r: 4*paletteSize, theta: -Math.PI / 4, fixedZ: 3 };
     let dragging = false;
     let prevMousePosition = {
         x: 0,
@@ -27,8 +29,8 @@ function main() {
     renderer.setSize(width, height);
     document.querySelector('main').appendChild(renderer.domElement);
 
-    colorCells.forEach(cube => scene.add(cube));
-    scene.add(gridHelper, axesHelper, skybox);
+    colorCells.forEach(cell => scene.add(cell));
+    scene.add(/*gridHelper, axesHelper, */skybox);
 
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('mousemove', onMouseMove);
@@ -39,9 +41,8 @@ function main() {
     function animate(time) {
         time *= 0.001;
 
-        colorCells.forEach(cube => {
-            cube.rotation.x = time;
-            cube.rotation.y = time;
+        colorCells.forEach(cell => {
+            cell.lookAt(camera.position);
         });
 
         renderer.render(scene, camera);
@@ -50,7 +51,7 @@ function main() {
     }
 
     function createGridHelper() {
-        const gridHelper = new THREE.GridHelper(30, 30);
+        const gridHelper = new THREE.GridHelper(paletteSize * 5, paletteSize * 5);
         gridHelper.rotation.x = Math.PI / 2;
         return gridHelper;
     }
@@ -85,7 +86,6 @@ function main() {
 
     function createColorCells(positions) {
         const colorCells = [];
-        const cellSize = 0.25;
         positions.forEach(coord => {
             // Calculate hue based on coordinates
             const hue = (Math.atan2(coord.y, coord.x) / Math.PI * 180 % 360) / 360;
@@ -98,7 +98,7 @@ function main() {
             const color = new THREE.Color().setHSL(hue, saturation, lightness);
     
             // Create hexagon geometry
-            const geometry = new THREE.OctahedronGeometry(cellSize, 0);
+            const geometry = new THREE.CircleGeometry(cellSize, 6);
             const material = new THREE.MeshBasicMaterial({ color: color });
             const colorCell = new THREE.Mesh(geometry, material);
             colorCell.position.copy(coord);
