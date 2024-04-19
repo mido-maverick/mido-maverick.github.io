@@ -4,6 +4,7 @@ import PaletteGrid from "./palette_grid.js";
 import ColorCell from "./color_cell.js";
 
 function main() {
+    // Constants
     const width = 768;
     const height = 512;
     const paletteGridSpan = 10;
@@ -24,29 +25,35 @@ function main() {
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+
+    // Variables
     let dragging = false;
     let prevMousePosition = { x: 0, y: 0 };
 
-    updateCameraPosition();
-    updateCameraUp();
-    updateCameraLookAt();
-
+    // Render setup
     renderer.setSize(width, height);
     document.querySelector('main').appendChild(renderer.domElement);
 
+    // Scene setup
     colorCells.forEach(colorCell => scene.add(colorCell.mesh));
     scene.add(skybox);
     //scene.add(axesHelper);
     //scene.add(polarGridHelper);
 
+    // Event listeners
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 
+    // Animation
     animate();
 
+
+    // Functions
     function animate(time) {
-        time *= 0.001;
+        updateCameraPosition();
+        updateCameraUp();
+        updateCameraLookAt();
 
         colorCells.forEach(colorCell => { colorCell.mesh.lookAt(camera.position); });
 
