@@ -5,10 +5,10 @@ import ColorCell from "./color_cell.js";
 
 function main() {
     // Constants
-    const width = 768;
-    const height = 512;
+    const width = 960;
+    const height = 540;
     const paletteGridSpan = 10;
-    const paletteGridSegmentCount = 15;
+    const paletteGridSegmentCount = 8;
     const colorCellSize = Math.sqrt(2) * paletteGridSpan / paletteGridSegmentCount;
 
     const renderer = new THREE.WebGLRenderer();
@@ -21,7 +21,8 @@ function main() {
     const paletteGrid = new PaletteGrid(paletteGridSpan, paletteGridSegmentCount);
     const colorCells = createColorCells(paletteGrid.coordinates);
 
-    const initialCameraPosition = { r: 4 * paletteGridSpan, theta: -Math.PI / 4, fixedZ: 3 };
+    //const initialCameraPosition = { r: 4 * paletteGridSpan, theta: -Math.PI / 4, fixedZ: 3 };
+    const cameraPolarCoordinates = { r: 4 * paletteGridSpan, thetaHorizontal: -Math.PI / 4, thetaVertical: 0 };
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -36,7 +37,7 @@ function main() {
 
     // Scene setup
     colorCells.forEach(colorCell => {
-        if (colorCell.isWithinSRGBGamut()) {
+        if (colorCell.isWithinSRGBGamut() || true) {
             scene.add(colorCell.mesh);
         }
     });
@@ -87,9 +88,9 @@ function main() {
     }
 
     function updateCameraPosition() {
-        camera.position.x = initialCameraPosition.r * Math.cos(initialCameraPosition.theta);
-        camera.position.y = initialCameraPosition.r * Math.sin(initialCameraPosition.theta);
-        camera.position.z = initialCameraPosition.fixedZ;
+        camera.position.x = cameraPolarCoordinates.r * Math.cos(cameraPolarCoordinates.thetaVertical) * Math.cos(cameraPolarCoordinates.thetaHorizontal);
+        camera.position.y = cameraPolarCoordinates.r * Math.cos(cameraPolarCoordinates.thetaVertical) * Math.sin(cameraPolarCoordinates.thetaHorizontal);
+        camera.position.z = cameraPolarCoordinates.r * Math.sin(cameraPolarCoordinates.thetaVertical);
         updateCameraLookAt(0, 0, 0);
     }
 
@@ -109,8 +110,12 @@ function main() {
 
     function onMouseMove(event) {
         if (dragging) {
-            const deltaTheta = (event.clientX - prevMousePosition.x) * -0.005;
-            initialCameraPosition.theta += deltaTheta;
+            const deltaThetaHorizontal = (event.clientX - prevMousePosition.x) * 0.005;
+            const deltaThetaVertical = (event.clientY - prevMousePosition.y) * 0.005;
+            cameraPolarCoordinates.thetaHorizontal -= deltaThetaHorizontal;
+            cameraPolarCoordinates.thetaVertical += deltaThetaVertical;
+            cameraPolarCoordinates.thetaVertical = Math.min(Math.PI / 2, cameraPolarCoordinates.thetaVertical);
+            cameraPolarCoordinates.thetaVertical = Math.max(-Math.PI / 2, cameraPolarCoordinates.thetaVertical);
             updateCameraPosition();
             prevMousePosition.x = event.clientX;
             prevMousePosition.y = event.clientY;
