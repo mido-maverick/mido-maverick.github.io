@@ -72,14 +72,14 @@ function main() {
     function createColorCells(coordinates) {
         const colorCells = [];
         coordinates.forEach(coordinate => {
-            // 0 ~ 359
+            // Calculate hue (0 ~ 359 degrees)
             const hue = (Math.atan2(coordinate.y, coordinate.x) / Math.PI * 180 % 360);
-            // 1 ~ ?
+            // Calculate saturation (0 ~ 1)
             const saturation = Math.min(1, Math.sqrt(coordinate.x * coordinate.x + coordinate.y * coordinate.y) / (paletteGridSpan / 2));
-            // 0 ~ ?
+            // Calculate lightness (0 ~ 1)
             const lightness = ((coordinate.z + paletteGridSpan) / (paletteGridSpan * Math.sqrt(3)));
-
-            const Okhsl = culori.okhsl('white');
+    
+            const Okhsl = culori.okhsl('black');
             Okhsl.h = hue;
             Okhsl.s = saturation;
             Okhsl.l = lightness;
