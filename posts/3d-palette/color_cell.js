@@ -13,10 +13,17 @@ class ColorCell {
         const material = new THREE.MeshBasicMaterial({ color: this.color });
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.position.copy(position);
+        //console.log('h:', okhsl.h.toFixed(3), 's:', okhsl.s.toFixed(3), 'l:', okhsl.l.toFixed(3));
+        //console.log('r:', rgb.r.toFixed(3), 'g:', rgb.g.toFixed(3), 'b:', rgb.b.toFixed(3));
     }
 
     isWithinSRGBGamut() {
-        return true;
+        return this.color.r >= 0.0 &&
+            this.color.g >= 0.0 &&
+            this.color.b >= 0.0 &&
+            this.color.r <= 1.0 &&
+            this.color.g <= 1.0 &&
+            this.color.b <= 1.0;
     }
 }
 
