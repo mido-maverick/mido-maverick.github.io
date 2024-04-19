@@ -35,7 +35,11 @@ function main() {
     document.querySelector('main').appendChild(renderer.domElement);
 
     // Scene setup
-    colorCells.forEach(colorCell => scene.add(colorCell.mesh));
+    colorCells.forEach(colorCell => {
+        if (colorCell.isWithinSRGBGamut()) {
+            scene.add(colorCell.mesh);
+        }
+    });
     scene.add(skybox);
     //scene.add(axesHelper);
     //scene.add(polarGridHelper);
@@ -78,10 +82,7 @@ function main() {
 
     function createColorCells(coordinates) {
         const colorCells = [];
-        coordinates.forEach(coordinate => {
-            const colorCell = new ColorCell(colorCellSize, coordinate, paletteGridSpan);
-            colorCells.push(colorCell);
-        });
+        coordinates.forEach(coordinate => { colorCells.push(new ColorCell(colorCellSize, coordinate, paletteGridSpan)); });
         return colorCells;
     }
 
