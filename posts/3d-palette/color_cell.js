@@ -15,8 +15,8 @@ class ColorCell {
         this.mesh.position.copy(position);
     }
 
-    isWithinSRGBGAmut() {
-        return false;
+    isWithinSRGBGamut() {
+        return true;
     }
 }
 
