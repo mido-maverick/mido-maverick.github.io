@@ -34,7 +34,7 @@ function main() {
     renderer.setSize(width, height);
     document.querySelector('main').appendChild(renderer.domElement);
 
-    colorCells.forEach(cell => scene.add(cell.mesh));
+    colorCells.forEach(colorCell => scene.add(colorCell.mesh));
     scene.add(skybox);
     scene.add(axesHelper);
     scene.add(polarGridHelper);
