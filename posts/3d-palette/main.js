@@ -48,7 +48,7 @@ function main() {
     function animate(time) {
         time *= 0.001;
 
-        colorCells.forEach(cell => { cell.mesh.lookAt(camera.position); });
+        colorCells.forEach(colorCell => { colorCell.mesh.lookAt(camera.position); });
 
         renderer.render(scene, camera);
 
@@ -125,12 +125,12 @@ function main() {
         }
         mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(colorCells, true);
-        if (intersects.length > 0) {
-            const intersectedObject = intersects[0].object;
-            //console.log('Mouse is pointing at:', intersectedObject);
-        }
+        //raycaster.setFromCamera(mouse, camera);
+        //const intersects = raycaster.intersectObjects(colorCells, true);
+        //if (intersects.length > 0) {
+        //    const intersectedObject = intersects[0].object;
+        //    //console.log('Mouse is pointing at:', intersectedObject);
+        //}
     }
 
     function onMouseUp(event) {
