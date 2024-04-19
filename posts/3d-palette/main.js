@@ -1,21 +1,26 @@
+// main.js
+
+import PaletteGrid from "./palette_grid.js";
+import ColorCell from "./color_cell.js";
+
 function main() {
     const width = 768;
     const height = 512;
-    const paletteSize = 10;
-    const paletteDivision = 8;
-    const cellSize = 0.8 * paletteSize / paletteDivision;
+    const paletteGridSpan = 10;
+    const paletteGridSegmentCount = 8;
+    const colorCellSize = 0.8 * paletteGridSpan / paletteGridSegmentCount;
 
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 1000);
-    const gridHelper = createGridHelper();
-    const axesHelper = new THREE.AxesHelper(1);
+    const camera = new THREE.PerspectiveCamera(3 * paletteGridSpan, width / height, 0.1, 1000);
+    const polarGridHelper = createPolarGridHelper();
+    const axesHelper = new THREE.AxesHelper(2 * paletteGridSpan);
     const skybox = createSkybox();
 
-    const colorCellPositions = createColorCellPositions(paletteDivision);
-    const colorCells = createColorCells(colorCellPositions);
+    const paletteGrid = new PaletteGrid(paletteGridSpan, paletteGridSegmentCount);
+    const colorCells = createColorCells(paletteGrid.coordinates);
 
-    const initialCameraPosition = { r: 4 * paletteSize, theta: -Math.PI / 4, fixedZ: 3 };
+    const initialCameraPosition = { r: 4 * paletteGridSpan, theta: -Math.PI / 4, fixedZ: 3 };
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -29,10 +34,10 @@ function main() {
     renderer.setSize(width, height);
     document.querySelector('main').appendChild(renderer.domElement);
 
-    colorCells.forEach(cell => scene.add(cell));
+    colorCells.forEach(cell => scene.add(cell.mesh));
     scene.add(skybox);
-    //scene.add(axesHelper);
-    //scene.add(gridHelper);
+    scene.add(axesHelper);
+    scene.add(polarGridHelper);
 
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('mousemove', onMouseMove);
@@ -43,17 +48,17 @@ function main() {
     function animate(time) {
         time *= 0.001;
 
-        colorCells.forEach(cell => { cell.lookAt(camera.position); });
+        colorCells.forEach(cell => { cell.mesh.lookAt(camera.position); });
 
         renderer.render(scene, camera);
 
         requestAnimationFrame(animate);
     }
 
-    function createGridHelper() {
-        const gridHelper = new THREE.GridHelper(5 * paletteSize, 5 * paletteSize);
-        gridHelper.rotation.x = Math.PI / 2;
-        return gridHelper;
+    function createPolarGridHelper() {
+        const polarGridHelper = new THREE.PolarGridHelper(5 * paletteGridSpan, 12, 12);
+        polarGridHelper.rotation.x = Math.PI / 2;
+        return polarGridHelper;
     }
 
     function createSkybox() {
@@ -64,32 +69,15 @@ function main() {
         return new THREE.Mesh(skyboxGeometry, skyboxMaterial);
     }
 
-    function createColorCellPositions(paletteDivision) {
-        const colorCellPositions = [];
-        const rotationMatrix = new THREE.Matrix4().set(
-            Math.sqrt(6) / 3, -Math.sqrt(6) / 6, -Math.sqrt(6) / 6, 0,
-                           0,  Math.sqrt(2) / 2, -Math.sqrt(2) / 2, 0,
-            Math.sqrt(3) / 3,  Math.sqrt(3) / 3,  Math.sqrt(3) / 3, 0,
-                           0,                 0,                 0, 1
-        );
-        const translationMatrix = new THREE.Matrix4().makeTranslation(0, 0, -paletteSize * Math.sqrt(3) / 2);
-        for (let x = 0; x <= paletteSize; x += paletteSize / (paletteDivision)) {
-            for (let y = 0; y <= paletteSize; y += paletteSize / (paletteDivision)) {
-                for (let z = 0; z <= paletteSize; z += paletteSize / (paletteDivision)) {
-                    const vector = new THREE.Vector3(x, y, z).applyMatrix4(rotationMatrix).applyMatrix4(translationMatrix);
-                    colorCellPositions.push(vector);
-                }
-            }
-        }
-        return colorCellPositions;
-    }
-
-    function createColorCells(positions) {
+    function createColorCells(coordinates) {
         const colorCells = [];
-        positions.forEach(coord => {
-            const hue = (Math.atan2(coord.y, coord.x) / Math.PI * 180 % 360);
-            const saturation = Math.min(1, Math.sqrt(coord.x * coord.x + coord.y * coord.y) / (paletteSize / 2));
-            const lightness = ((coord.z + paletteSize) / (paletteSize * Math.sqrt(3)));
+        coordinates.forEach(coordinate => {
+            // 0 ~ 359
+            const hue = (Math.atan2(coordinate.y, coordinate.x) / Math.PI * 180 % 360);
+            // 1 ~ ?
+            const saturation = Math.min(1, Math.sqrt(coordinate.x * coordinate.x + coordinate.y * coordinate.y) / (paletteGridSpan / 2));
+            // 0 ~ ?
+            const lightness = ((coordinate.z + paletteGridSpan) / (paletteGridSpan * Math.sqrt(3)));
 
             const Okhsl = culori.okhsl('white');
             Okhsl.h = hue;
@@ -99,10 +87,8 @@ function main() {
             const rgb = culori.convertOklabToRgb(Oklab);
             const color = new THREE.Color().setRGB(rgb.r, rgb.g, rgb.b);
 
-            const geometry = new THREE.CircleGeometry(cellSize / 2, 6);
-            const material = new THREE.MeshBasicMaterial({ color: color });
-            const colorCell = new THREE.Mesh(geometry, material);
-            colorCell.position.copy(coord);
+            const colorCell = new ColorCell(colorCellSize, color);
+            colorCell.mesh.position.copy(coordinate);
             colorCells.push(colorCell);
         });
         return colorCells;
@@ -143,7 +129,7 @@ function main() {
         const intersects = raycaster.intersectObjects(colorCells, true);
         if (intersects.length > 0) {
             const intersectedObject = intersects[0].object;
-            console.log('Mouse is pointing at:', intersectedObject);
+            //console.log('Mouse is pointing at:', intersectedObject);
         }
     }
 
