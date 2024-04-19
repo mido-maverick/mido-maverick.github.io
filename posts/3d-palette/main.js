@@ -7,7 +7,7 @@ function main() {
     const width = 768;
     const height = 512;
     const paletteGridSpan = 10;
-    const paletteGridSegmentCount = 8;
+    const paletteGridSegmentCount = 16;
     const colorCellSize = 0.8 * paletteGridSpan / paletteGridSegmentCount;
 
     const renderer = new THREE.WebGLRenderer();
@@ -36,8 +36,8 @@ function main() {
 
     colorCells.forEach(colorCell => scene.add(colorCell.mesh));
     scene.add(skybox);
-    scene.add(axesHelper);
-    scene.add(polarGridHelper);
+    //scene.add(axesHelper);
+    //scene.add(polarGridHelper);
 
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('mousemove', onMouseMove);
@@ -72,23 +72,7 @@ function main() {
     function createColorCells(coordinates) {
         const colorCells = [];
         coordinates.forEach(coordinate => {
-            // Calculate hue (0 ~ 359 degrees)
-            const hue = (Math.atan2(coordinate.y, coordinate.x) / Math.PI * 180 % 360);
-            // Calculate saturation (0 ~ 1)
-            const saturation = Math.min(1, Math.sqrt(coordinate.x * coordinate.x + coordinate.y * coordinate.y) / (paletteGridSpan / 2));
-            // Calculate lightness (0 ~ 1)
-            const lightness = ((coordinate.z + paletteGridSpan) / (paletteGridSpan * Math.sqrt(3)));
-    
-            const Okhsl = culori.okhsl('black');
-            Okhsl.h = hue;
-            Okhsl.s = saturation;
-            Okhsl.l = lightness;
-            const Oklab = culori.convertOkhslToOklab(Okhsl);
-            const rgb = culori.convertOklabToRgb(Oklab);
-            const color = new THREE.Color().setRGB(rgb.r, rgb.g, rgb.b);
-
-            const colorCell = new ColorCell(colorCellSize, color);
-            colorCell.mesh.position.copy(coordinate);
+            const colorCell = new ColorCell(colorCellSize, coordinate, paletteGridSpan);
             colorCells.push(colorCell);
         });
         return colorCells;
