@@ -8,7 +8,7 @@ function main() {
     const width = 768;
     const height = 512;
     const paletteGridSpan = 10;
-    const paletteGridSegmentCount = 5;
+    const paletteGridSegmentCount = 15;
     const colorCellSize = Math.sqrt(2) * paletteGridSpan / paletteGridSegmentCount;
 
     const renderer = new THREE.WebGLRenderer();
