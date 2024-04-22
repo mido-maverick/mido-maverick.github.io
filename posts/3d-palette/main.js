@@ -8,12 +8,12 @@ function main() {
     const width = 960;
     const height = 540;
     const paletteGridSpan = 10;
-    const paletteGridSegmentCount = 8;
+    const paletteGridSegmentCount = 5;
     const colorCellSize = Math.sqrt(2) * paletteGridSpan / paletteGridSegmentCount;
 
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(3 * paletteGridSpan, width / height, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 1000);
     const polarGridHelper = createPolarGridHelper();
     const axesHelper = new THREE.AxesHelper(2 * paletteGridSpan);
     const skybox = createSkybox();
@@ -21,7 +21,6 @@ function main() {
     const paletteGrid = new PaletteGrid(paletteGridSpan, paletteGridSegmentCount);
     const colorCells = createColorCells(paletteGrid.coordinates);
 
-    //const initialCameraPosition = { r: 4 * paletteGridSpan, theta: -Math.PI / 4, fixedZ: 3 };
     const cameraPolarCoordinates = { r: 4 * paletteGridSpan, thetaHorizontal: -Math.PI / 4, thetaVertical: 0 };
 
     const raycaster = new THREE.Raycaster();
