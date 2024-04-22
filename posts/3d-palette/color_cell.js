@@ -2,18 +2,17 @@
 
 class ColorCell {
     constructor(size, position, paletteGridSpan) {
-        const okhsl = culori.okhsl('black');
-        okhsl.h = (Math.atan2(position.y, position.x) / Math.PI * 180 % 360);
-        okhsl.s = Math.min(1, Math.sqrt(position.x * position.x + position.y * position.y) / (paletteGridSpan / 2));
-        okhsl.l = ((position.z + paletteGridSpan) / (paletteGridSpan * Math.sqrt(3)));
-        const oklab = culori.convertOkhslToOklab(okhsl);
+        const oklab = culori.oklab('black');
+        oklab.l = position.z / (paletteGridSpan * Math.sqrt(3)) + 0.5;
+        oklab.a = position.x / (paletteGridSpan * Math.sqrt(3));
+        oklab.b = position.y / (paletteGridSpan * Math.sqrt(3));
         const rgb = culori.convertOklabToRgb(oklab);
         this.color = new THREE.Color().setRGB(rgb.r, rgb.g, rgb.b);
         const geometry = new THREE.CircleGeometry(size / 2, 6);
         const material = new THREE.MeshBasicMaterial({ color: this.color });
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.position.copy(position);
-        //console.log('h:', okhsl.h.toFixed(3), 's:', okhsl.s.toFixed(3), 'l:', okhsl.l.toFixed(3));
+        //console.log('l:', oklab.l.toFixed(3), 'a:', oklab.a.toFixed(3), 'b:', oklab.b.toFixed(3));
         //console.log('r:', rgb.r.toFixed(3), 'g:', rgb.g.toFixed(3), 'b:', rgb.b.toFixed(3));
     }
 
