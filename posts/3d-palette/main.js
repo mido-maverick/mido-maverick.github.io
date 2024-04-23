@@ -8,7 +8,7 @@ function main() {
     const width = 960;
     const height = 540;
     const paletteGridSpan = 10;
-    const paletteGridSegmentCount = 5;
+    const paletteGridSegmentCount = 24;
     const colorCellSize = Math.sqrt(2) * paletteGridSpan / paletteGridSegmentCount;
 
     const renderer = new THREE.WebGLRenderer();
@@ -21,7 +21,7 @@ function main() {
     const paletteGrid = new PaletteGrid(paletteGridSpan, paletteGridSegmentCount);
     const colorCells = createColorCells(paletteGrid.coordinates);
 
-    const cameraPolarCoordinates = { r: 4 * paletteGridSpan, thetaHorizontal: -Math.PI / 4, thetaVertical: 0 };
+    const cameraPolarCoordinates = { r: 2 * paletteGridSpan, thetaHorizontal: -Math.PI / 4, thetaVertical: 0 };
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -36,7 +36,7 @@ function main() {
 
     // Scene setup
     colorCells.forEach(colorCell => {
-        if (colorCell.isWithinSRGBGamut() || true) {
+        if (colorCell.isWithinSRGBGamut() && true) {
             scene.add(colorCell.mesh);
         }
     });
