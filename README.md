@@ -1,1 +1,1 @@
-# Github Page [Link](https://mido-maverick.github.io "Mido Maverick")
+# GitHub Page [Link](https://mido-maverick.github.io "Mido Maverick")
